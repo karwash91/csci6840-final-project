@@ -29,6 +29,19 @@ class HourlyAggregationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate timestamps"):
             clean_and_resample_hourly(frame)
 
+    def test_wind_direction_uses_circular_mean(self) -> None:
+        timestamps = pd.date_range("2026-01-01 00:10", periods=6, freq="10min")
+        frame = pd.DataFrame(
+            {
+                TIMESTAMP_COLUMN: timestamps,
+                "T (degC)": [10.0] * 6,
+                "wd (deg)": [359.0, 1.0, 359.0, 1.0, 359.0, 1.0],
+            }
+        )
+        hourly = clean_and_resample_hourly(frame)
+
+        self.assertAlmostEqual(hourly.iloc[0]["wd (deg)"], 0.0, places=6)
+
 
 if __name__ == "__main__":
     unittest.main()

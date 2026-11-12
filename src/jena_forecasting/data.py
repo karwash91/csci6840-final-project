@@ -3,11 +3,13 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 TIMESTAMP_COLUMN = "Date Time"
 TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
 INVALID_READING_FLOOR = -999.0
+WIND_DIRECTION_COLUMN = "wd (deg)"
 
 
 @dataclass(frozen=True)
@@ -74,6 +76,14 @@ def clean_and_resample_hourly(
     numeric = numeric.mask(numeric <= INVALID_READING_FLOOR)
     resampler = numeric.resample("1h", closed="right", label="right")
     hourly = resampler.mean()
+    if WIND_DIRECTION_COLUMN in numeric.columns:
+        radians = np.deg2rad(numeric[WIND_DIRECTION_COLUMN])
+        sin_mean = np.sin(radians).resample("1h", closed="right", label="right").mean()
+        cos_mean = np.cos(radians).resample("1h", closed="right", label="right").mean()
+        magnitude = np.hypot(sin_mean, cos_mean)
+        direction = np.mod(np.rad2deg(np.arctan2(sin_mean, cos_mean)), 360.0)
+        direction = direction.mask(np.isclose(direction, 360.0), 0.0)
+        hourly[WIND_DIRECTION_COLUMN] = direction.mask(magnitude < 1e-12)
     timestamp_counts = indexed.resample("1h", closed="right", label="right").size()
     hourly = hourly.loc[timestamp_counts >= expected_readings_per_hour]
     hourly.index.name = "timestamp"

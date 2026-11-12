@@ -6,6 +6,10 @@
     24
   ],
   "history_hours": 24,
+  "validation_history_hours": [
+    12,
+    24
+  ],
   "train_end": "2014-12-31T23:00:00",
   "validation_end": "2015-12-31T23:00:00",
   "test_end": "2016-12-31T23:00:00",
@@ -16,6 +20,20 @@
     "min_samples_leaf": 2,
     "n_jobs": -1
   },
+  "random_forest_candidates": [
+    {
+      "n_estimators": 100,
+      "max_depth": 12,
+      "min_samples_leaf": 2,
+      "n_jobs": -1
+    },
+    {
+      "n_estimators": 200,
+      "max_depth": 18,
+      "min_samples_leaf": 2,
+      "n_jobs": -1
+    }
+  ],
   "multivariate_columns": [
     "p (mbar)",
     "T (degC)",

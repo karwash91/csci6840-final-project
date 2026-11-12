@@ -14,9 +14,14 @@ confirm before the final test run.
 - Partition assignment by target timestamp so a target cannot cross a train,
   validation, or test boundary.
 - Training-only imputation and scaling through scikit-learn pipelines.
+- Validation-only selection of history length and random-forest settings, with
+  a frozen configuration required before final test evaluation.
 - Matching test origins across every model and input set at a given horizon.
+- Circular hourly aggregation for wind direction and finite-value enforcement
+  for the persistence baseline and all reported metrics.
 - Timestamped prediction files, fitted models, test metrics, and a run manifest
-  containing the exact configuration and software environment.
+  containing the exact configuration, code commit, input fingerprint, software
+  environment, and partition counts and date ranges.
 
 ## Provisional choices to confirm
 

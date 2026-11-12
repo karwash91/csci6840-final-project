@@ -12,6 +12,8 @@ def regression_metrics(
     predicted = np.asarray(predicted, dtype=float)
     if actual.shape != predicted.shape or actual.size == 0:
         raise ValueError("Metric inputs must have the same nonzero shape.")
+    if not np.isfinite(actual).all() or not np.isfinite(predicted).all():
+        raise ValueError("Metric inputs must contain only finite values.")
     errors = actual - predicted
     mae = float(np.mean(np.abs(errors)))
     rmse = float(math.sqrt(np.mean(np.square(errors))))

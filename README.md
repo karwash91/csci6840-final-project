@@ -26,12 +26,18 @@ python -m pip install -e ".[dev]"
 python scripts/download_data.py
 jena-forecast audit --input data/raw/jena_climate_2009_2016.csv
 jena-forecast preprocess --input data/raw/jena_climate_2009_2016.csv
-jena-forecast run --input data/processed/jena_hourly.csv
+jena-forecast tune --input data/processed/jena_hourly.csv
+jena-forecast run \
+  --input data/processed/jena_hourly.csv \
+  --config outputs/tuning/<timestamp>/frozen_config.json
 ```
 
-The run command writes metrics, timestamped predictions, and a run manifest
-beneath `outputs/latest/`. Do not edit those outputs by hand. Preserve the
-exact output directory used for the presentation recording.
+The tune command compares the configured history lengths and random-forest
+settings using validation data, then writes `validation_scores.csv` and a
+frozen configuration. The run command refuses an unfrozen configuration and
+writes metrics, timestamped predictions, models, and a run manifest to a unique
+timestamped directory beneath `outputs/runs/`. Do not edit those outputs by
+hand. Preserve the exact directory used for the presentation recording.
 
 ## Experiment design
 
@@ -46,6 +52,10 @@ exact output directory used for the presentation recording.
   percent improvement in MAE and RMSE over persistence.
 - Leakage control: rows are assigned to a partition using the target timestamp,
   and lag values are matched by timestamp rather than by row position.
+- Persistence control: comparisons require an observed temperature at the
+  forecast origin, and metric calculation rejects nonfinite values.
+- Wind direction: hourly values use a circular mean so directions around zero
+  degrees are not incorrectly averaged to 180 degrees.
 
 The proposed split is training through 2014, validation during 2015, and test
 during 2016. Confirm the loaded dataset range and split with the team before
@@ -70,7 +80,9 @@ docs/                   Experiment decisions and open review items
 1. Commit configuration changes before a final run.
 2. Never tune on the test partition.
 3. Keep the same forecast origins and targets when comparing models.
-4. Keep raw and generated data out of Git; save a manifest with every run.
+4. Keep raw and generated data out of Git; save a manifest with every run. The
+   manifest records the commit, dirty-tree state, input SHA-256, package
+   versions, and partition counts and date ranges.
 5. Trace every slide result to a committed config and a saved output file.
 
 Run checks with:
