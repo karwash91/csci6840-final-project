@@ -1,0 +1,35 @@
+{
+  "target_column": "T (degC)",
+  "horizons_hours": [
+    1,
+    6,
+    24
+  ],
+  "history_hours": 24,
+  "train_end": "2014-12-31T23:00:00",
+  "validation_end": "2015-12-31T23:00:00",
+  "test_end": "2016-12-31T23:00:00",
+  "random_seed": 6840,
+  "random_forest": {
+    "n_estimators": 300,
+    "max_depth": 18,
+    "min_samples_leaf": 2,
+    "n_jobs": -1
+  },
+  "multivariate_columns": [
+    "p (mbar)",
+    "T (degC)",
+    "Tpot (K)",
+    "Tdew (degC)",
+    "rh (%)",
+    "VPmax (mbar)",
+    "VPact (mbar)",
+    "VPdef (mbar)",
+    "sh (g/kg)",
+    "H2OC (mmol/mol)",
+    "rho (g/m**3)",
+    "wv (m/s)",
+    "max. wv (m/s)",
+    "wd (deg)"
+  ]
+}
